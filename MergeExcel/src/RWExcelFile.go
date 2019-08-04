@@ -17,8 +17,10 @@ func main() {
 	conn, err := net.ListenUDP("udp", udp_addr)
 	defer conn.Close()
 	checkError(err)
+	for ; ;  {
+		recvUDPMsg(conn)
+	}
 
-	recvUDPMsg(conn)
 }
 
 //func copy(src, dst string) (int64, error) {
@@ -50,32 +52,31 @@ func recvUDPMsg(conn *net.UDPConn) {
 
 	n, _, err := conn.ReadFromUDP(buf[0:])
 	if err != nil {
-		fmt.Println("err is ", err)
+		fmt.Println("ReadFromUDP err is ", err)
 		return
 	}
 	// 解析json数据
 	var jsonData JsonData
 	err = json.Unmarshal(buf[0:n], &jsonData) // 必须指定最后的长度，否则解析失败，存在0x00错误
 	if err != nil {
-		fmt.Println("err is sss", err)
+		fmt.Println("json Unmarshal err is ", err)
 		return
 	}
 	// 读取源excel文件指定列内容
 	srcFileName := jsonData.SrcJson.SrcExcelPath
-	//strSrcColumn := "C"
 	srcXls, err := excelize.OpenFile(srcFileName)
 	if err != nil {
-		fmt.Printf("open failed: %s\n", err)
+		fmt.Printf("open src file failed: %s\n", err)
 	}
 	srcRowsData, _ := srcXls.GetRows(jsonData.SrcJson.SrcSheetName)
-	fmt.Println(srcRowsData)
+	//fmt.Println(srcRowsData)
 
 	// 合并到目的excel文件
 	dstFileName := jsonData.DstJson.DstExcelPath
 	dstxls, err := excelize.OpenFile(dstFileName)
 
 	if err != nil {
-		fmt.Printf("open failed: %s\n", err)
+		fmt.Printf("open dst file failed: %s\n", err)
 		return
 	}
 	dstRowsData, _ := dstxls.GetRows(jsonData.DstJson.DstSheetName) // 哪个Sheet
@@ -88,7 +89,7 @@ func recvUDPMsg(conn *net.UDPConn) {
 	dstDstColumn, err := getColumnIndex(jsonData.DstJson.DstColumn2)
 	srcContextColumn, err := getColumnIndex(jsonData.SrcJson.StrContext)
 	dstContextColumn, err := getColumnIndex(jsonData.DstJson.StrContext)
-	fmt.Printf("srcs = %v, dsts = %v", jsonData.DstJson.StrContext, dstContextColumn)
+	//fmt.Printf("srcs = %v, dsts = %v", jsonData.DstJson.StrContext, dstContextColumn)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -109,6 +110,8 @@ func recvUDPMsg(conn *net.UDPConn) {
 	err = dstxls.Save()
 	if err != nil {
 		fmt.Printf("save err=%s\n", err)
+	}else {
+		fmt.Println("Save excel success")
 	}
 }
 

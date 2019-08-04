@@ -21,6 +21,10 @@ private slots:
 
     void on_buttonBox_rejected();
 
+    void on_srcBrowserBtn_clicked();
+
+    void on_dstBrowserBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     QUdpSocket *m_sender;

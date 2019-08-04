@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDir>
 #include <QJsonArray>
 #include <QJsonObject>
-
+#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -56,4 +57,16 @@ void MainWindow::on_buttonBox_accepted()
 void MainWindow::on_buttonBox_rejected()
 {
 
+}
+
+void MainWindow::on_srcBrowserBtn_clicked()
+{
+    QString strPath = QFileDialog::getOpenFileName(this, tr("Source Excel file"), ".", tr("Excel Files(*.xlsx)"));
+    ui->srcExcelPath->setText(strPath);
+}
+
+void MainWindow::on_dstBrowserBtn_clicked()
+{
+    QString strPath = QFileDialog::getOpenFileName(this, tr("Dist Excel file"), ".", tr("Excel Files(*.xlsx)"));
+    ui->dstExcelPath->setText(strPath);
 }
